@@ -1,0 +1,456 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header" style="text-align: center; margin-bottom: 40px;">
+        <h2><i class="fas fa-hand-holding-usd"></i> Loan Prediction</h2>
+        <p>Get your maximum eligible loan amount and interest rate based on your credit profile</p>
+    </div>
+
+    <!-- Loan Prediction Form -->
+    <div class="section-card">
+        <div class="section-card__header">
+            <div class="header-icon">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+            <div>
+                <h3>Customer Information</h3>
+                <p class="text-muted">Enter your financial details for loan assessment</p>
+            </div>
+        </div>
+        
+        <form id="loanForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label><i class="fas fa-rupee-sign"></i> Monthly Income (₹)</label>
+                    <input type="number" id="monthly_income" name="monthly_income" class="form-control" placeholder="e.g., 75000" value="75000" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-chart-line"></i> Credit Score (300-850)</label>
+                    <input type="number" id="credit_score" name="credit_score" class="form-control" placeholder="e.g., 720" value="720" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-credit-card"></i> Credit Limit (₹)</label>
+                    <input type="number" id="limit_bal" name="limit_bal" class="form-control" placeholder="e.g., 200000" value="200000" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Age</label>
+                    <input type="number" id="age" name="age" class="form-control" placeholder="e.g., 35" value="35" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Payment History (PAY_0)</label>
+                    <select id="pay_0" name="pay_0" class="form-control">
+                        <option value="-2">Excellent (-2)</option>
+                        <option value="-1">Very Good (-1)</option>
+                        <option value="0" selected>Good (0)</option>
+                        <option value="1">1 Month Delay</option>
+                        <option value="2">2 Months Delay</option>
+                        <option value="3">3+ Months Delay</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-briefcase"></i> Employment Years</label>
+                    <input type="number" id="employment_years" name="employment_years" class="form-control" placeholder="e.g., 5" value="5" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-file-invoice"></i> Loan Term (Years)</label>
+                    <select id="loan_term_years" name="loan_term_years" class="form-control">
+                        <option value="3">3 Years</option>
+                        <option value="5" selected>5 Years</option>
+                        <option value="7">7 Years</option>
+                        <option value="10">10 Years</option>
+                        <option value="15">15 Years</option>
+                        <option value="20">20 Years</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-graduation-cap"></i> Education</label>
+                    <select id="education" name="education" class="form-control">
+                        <option value="1">Graduate School</option>
+                        <option value="2" selected>University</option>
+                        <option value="3">High School</option>
+                        <option value="4">Others</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-calculator"></i> Predict Loan
+                </button>
+                <button type="button" class="btn-secondary" onclick="resetLoanForm()">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+                <button type="button" class="btn-sample" onclick="loadSampleLoanData()">
+                    <i class="fas fa-chart-simple"></i> Load Sample
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Section -->
+    <div id="predictionResult" style="display: none;"></div>
+</div>
+
+<style>
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 0;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        background: var(--bg-hover);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--accent-info);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        padding: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 30px;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
+    }
+    
+    .btn-secondary {
+        background: var(--bg-hover);
+        border: 1px solid var(--border-color);
+        padding: 12px 30px;
+        border-radius: 30px;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .btn-sample {
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        padding: 12px 30px;
+        border-radius: 30px;
+        color: #10b981;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-sample:hover {
+        background: rgba(16, 185, 129, 0.25);
+    }
+    
+    .prediction-result-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 30px;
+        margin: 30px 0;
+    }
+    
+    .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .result-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .result-item {
+        text-align: center;
+        padding: 15px;
+        background: var(--bg-hover);
+        border-radius: 12px;
+    }
+    
+    .result-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .result-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+    
+    .result-value.large {
+        font-size: 1.8rem;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    
+    .risk-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .risk-success {
+        background: rgba(16, 185, 129, 0.2);
+        color: #10b981;
+    }
+    
+    .risk-warning {
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+    }
+    
+    .risk-danger {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+    }
+    
+    .recommendations {
+        margin-top: 25px;
+        padding: 20px;
+        background: var(--bg-hover);
+        border-radius: 12px;
+    }
+    
+    .recommendations ul {
+        list-style: none;
+        padding: 0;
+        margin: 10px 0 0;
+    }
+    
+    .recommendations li {
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .recommendations li:last-child {
+        border-bottom: none;
+    }
+    
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(99, 102, 241, 0.2);
+        border-top-color: #6366f1;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 30px auto;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    .alert {
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin: 20px 0;
+    }
+    
+    .alert-danger {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+    }
+</style>
+
+<script>
+    const loanForm = document.getElementById('loanForm');
+    
+    loanForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const customerData = {
+            monthly_income: parseFloat(document.getElementById('monthly_income').value) || 0,
+            credit_score: parseFloat(document.getElementById('credit_score').value) || 0,
+            LIMIT_BAL: parseFloat(document.getElementById('limit_bal').value) || 0,
+            AGE: parseFloat(document.getElementById('age').value) || 0,
+            PAY_0: parseInt(document.getElementById('pay_0').value) || 0,
+            employment_years: parseFloat(document.getElementById('employment_years').value) || 0,
+            loan_term_years: parseInt(document.getElementById('loan_term_years').value) || 5,
+            EDUCATION: parseInt(document.getElementById('education').value) || 2,
+            // Additional fields for the model
+            PAY_2: parseInt(document.getElementById('pay_0').value) || 0,
+            PAY_3: parseInt(document.getElementById('pay_0').value) || 0,
+            PAY_4: 0, PAY_5: 0, PAY_6: 0,
+            BILL_AMT1: 50000, BILL_AMT2: 50000, BILL_AMT3: 50000,
+            BILL_AMT4: 50000, BILL_AMT5: 50000, BILL_AMT6: 50000,
+            PAY_AMT1: 10000, PAY_AMT2: 10000, PAY_AMT3: 10000,
+            PAY_AMT4: 10000, PAY_AMT5: 10000, PAY_AMT6: 10000,
+            MARRIAGE: 2
+        };
+        
+        const resultDiv = document.getElementById('predictionResult');
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = '<div class="loading-spinner"></div><p class="text-center">Analyzing your loan eligibility...</p>';
+        
+        try {
+            const response = await fetch('/api/predict-loan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(customerData)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                displayLoanResult(data.prediction);
+                showToast('Loan prediction completed!', 'success');
+            } else {
+                resultDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                showToast(data.error, 'error');
+            }
+        } catch (error) {
+            resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            showToast(error.message, 'error');
+        }
+    });
+    
+    function displayLoanResult(pred) {
+        const resultDiv = document.getElementById('predictionResult');
+        
+        const html = `
+            <div class="prediction-result-card">
+                <div class="result-header">
+                    <h3><i class="fas fa-chart-line"></i> Loan Eligibility Result</h3>
+                    <span class="risk-badge risk-${pred.risk_color}">${pred.risk_category}</span>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="result-label">Maximum Loan Amount</div>
+                        <div class="result-value large">${pred.formatted_amount}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Interest Rate</div>
+                        <div class="result-value">${pred.interest_rate}%</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Monthly EMI</div>
+                        <div class="result-value">${pred.formatted_emi}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Total Repayment</div>
+                        <div class="result-value">₹${pred.total_repayment.toLocaleString()}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Total Interest</div>
+                        <div class="result-value">₹${pred.total_interest.toLocaleString()}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Risk Probability</div>
+                        <div class="result-value">${pred.risk_probability}%</div>
+                    </div>
+                </div>
+                
+                <div class="recommendations">
+                    <h4><i class="fas fa-lightbulb"></i> Recommendations</h4>
+                    <ul>
+                        ${pred.recommendations.map(rec => `<li><i class="fas fa-check-circle" style="color: #10b981; margin-right: 10px;"></i> ${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+        `;
+        
+        resultDiv.innerHTML = html;
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    function resetLoanForm() {
+        document.getElementById('monthly_income').value = '75000';
+        document.getElementById('credit_score').value = '720';
+        document.getElementById('limit_bal').value = '200000';
+        document.getElementById('age').value = '35';
+        document.getElementById('employment_years').value = '5';
+        document.getElementById('education').value = '2';
+        document.getElementById('pay_0').value = '0';
+        document.getElementById('loan_term_years').value = '5';
+        
+        const resultDiv = document.getElementById('predictionResult');
+        resultDiv.style.display = 'none';
+        resultDiv.innerHTML = '';
+        
+        showToast('Form has been reset', 'info');
+    }
+    
+    async function loadSampleLoanData() {
+        try {
+            const response = await fetch('/api/get-sample-data');
+            const data = await response.json();
+            
+            if (data.loan) {
+                document.getElementById('monthly_income').value = data.loan.monthly_income;
+                document.getElementById('credit_score').value = data.loan.credit_score;
+                document.getElementById('limit_bal').value = data.loan.LIMIT_BAL || 200000;
+                document.getElementById('age').value = data.loan.AGE || 35;
+                document.getElementById('employment_years').value = data.loan.employment_years;
+                showToast('Sample loan data loaded! Click "Predict Loan"', 'success');
+            }
+        } catch(e) {
+            console.error(e);
+            showToast('Could not load sample data', 'error');
+        }
+    }
+    
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification toast-${type}`;
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+</script>
+{% endblock %}

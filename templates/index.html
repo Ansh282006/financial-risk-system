@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <div class="hero-badge">
+            <i class="fas fa-robot"></i> ML-Powered Financial Intelligence
+        </div>
+        <h1>Financial Risk <span class="gradient-text">Early Warning</span> System</h1>
+        <p class="hero-subtitle">
+            Powered by 7 Financial Datasets | Real-time ML Predictions
+        </p>
+    </div>
+</section>
+
+<div class="container">
+    <div class="features-grid">
+        <!-- CSV Upload & Analysis Card -->
+        <div class="feature-card" onclick="location.href='/upload'">
+            <div class="feature-icon"><i class="fas fa-file-csv"></i></div>
+            <h3>CSV Data Analysis</h3>
+            <p>Upload your financial data and get comprehensive analysis with automated chart generation</p>
+            <div class="feature-tag">Data Structures & Algorithms</div>
+        </div>
+
+        <!-- Loan Prediction Card -->
+        <div class="feature-card" onclick="location.href='/loan-prediction'">
+            <div class="feature-icon"><i class="fas fa-hand-holding-usd"></i></div>
+            <h3>Loan Prediction</h3>
+            <p>Get maximum eligible loan amount and interest rate based on your credit profile</p>
+            <div class="feature-tag">Random Forest Regression</div>
+        </div>
+
+        <!-- Risk Analysis Card -->
+        <div class="feature-card" onclick="location.href='/risk-analysis'">
+            <div class="feature-icon"><i class="fas fa-chart-pie"></i></div>
+            <h3>Risk Analysis</h3>
+            <p>Analyze your current investment portfolio for risk scores and profit projections</p>
+            <div class="feature-tag">Risk Classification</div>
+        </div>
+
+        <!-- Investment Planning Card -->
+        <div class="feature-card" onclick="location.href='/investment-planning'">
+            <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+            <h3>Investment Planning</h3>
+            <p>Get personalized investment plans with sector-wise allocation for your goals</p>
+            <div class="feature-tag">Time Series Forecasting</div>
+        </div>
+
+        <!-- Chart Visualization Card - SEPARATE BUTTON -->
+        <div class="feature-card" onclick="location.href='/upload'">
+            <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
+            <h3>Chart Visualization</h3>
+            <p>Upload CSV files and generate professional charts including distributions, heatmaps, and box plots</p>
+            <div class="feature-tag">Matplotlib & Seaborn</div>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <div class="stat-card-large">
+            <div class="stat-value">7</div>
+            <div class="stat-label">Financial Datasets</div>
+        </div>
+        <div class="stat-card-large">
+            <div class="stat-value">95%</div>
+            <div class="stat-label">Model Accuracy</div>
+        </div>
+        <div class="stat-card-large">
+            <div class="stat-value">4</div>
+            <div class="stat-label">ML Models</div>
+        </div>
+        <div class="stat-card-large">
+            <div class="stat-value">24/7</div>
+            <div class="stat-label">Real-time</div>
+        </div>
+    </div>
+
+    <div class="datasets-preview">
+        <h3><i class="fas fa-database"></i> Available Datasets for Training</h3>
+        <div class="dataset-list" id="datasetList"></div>
+    </div>
+</div>
+
+<style>
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin: 40px 0;
+    }
+    
+    .feature-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent-info);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+    
+    .feature-icon i {
+        font-size: 2rem;
+        color: white;
+    }
+    
+    .feature-card h3 {
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+    
+    .feature-card p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    .feature-tag {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 5px 12px;
+        background: rgba(99,102,241,0.15);
+        border-radius: 20px;
+        font-size: 0.7rem;
+        color: var(--accent-info);
+    }
+    
+    .stats-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin: 40px 0;
+    }
+    
+    .stat-card-large {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 25px;
+        text-align: center;
+        transition: all 0.3s;
+    }
+    
+    .stat-card-large:hover {
+        transform: translateY(-3px);
+        border-color: var(--accent-info);
+    }
+    
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 8px;
+    }
+    
+    .datasets-preview {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 25px;
+        margin: 40px 0;
+    }
+    
+    .datasets-preview h3 {
+        margin-bottom: 20px;
+        font-size: 1.2rem;
+    }
+    
+    .dataset-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+    }
+    
+    .dataset-badge {
+        background: var(--bg-hover);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 12px 15px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.3s;
+    }
+    
+    .dataset-badge:hover {
+        border-color: var(--accent-info);
+        transform: translateX(5px);
+    }
+    
+    .dataset-badge i {
+        font-size: 1.5rem;
+        color: var(--accent-info);
+    }
+    
+    .dataset-badge strong {
+        flex: 1;
+        font-size: 0.85rem;
+    }
+    
+    .dataset-badge small {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+    }
+    
+    @media (max-width: 768px) {
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+        .stats-section {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .dataset-list {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .stats-section {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    async function loadDatasets() {
+        try {
+            const response = await fetch('/api/get-datasets-info');
+            const data = await response.json();
+            const container = document.getElementById('datasetList');
+            
+            let html = '';
+            for (const [name, info] of Object.entries(data)) {
+                if (info.exists) {
+                    let displayName = name.replace(/_/g, ' ').toUpperCase();
+                    let icon = 'fa-chart-line';
+                    if (name.includes('credit')) icon = 'fa-credit-card';
+                    else if (name.includes('loan')) icon = 'fa-hand-holding-usd';
+                    else if (name.includes('market')) icon = 'fa-chart-simple';
+                    else if (name.includes('economic')) icon = 'fa-chart-gantt';
+                    else if (name.includes('operational')) icon = 'fa-exclamation-triangle';
+                    
+                    html += `
+                        <div class="dataset-badge">
+                            <i class="fas ${icon}"></i>
+                            <strong>${displayName}</strong>
+                            <small>${info.size_mb} MB | ${info.columns} cols</small>
+                        </div>
+                    `;
+                }
+            }
+            container.innerHTML = html || '<p class="text-muted">No datasets found. Please check your dataset directory.</p>';
+        } catch(e) {
+            console.error(e);
+            document.getElementById('datasetList').innerHTML = '<p class="text-danger">Error loading datasets</p>';
+        }
+    }
+    
+    loadDatasets();
+</script>
+{% endblock %}
